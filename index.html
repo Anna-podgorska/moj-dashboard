@@ -16,12 +16,18 @@
       align-items: center;
       padding: 32px 16px;
       min-height: 100vh;
+      gap: 32px;
     }
     h1 {
       font-size: 1.5rem;
       color: #2d3748;
       margin-bottom: 24px;
       text-align: center;
+    }
+    h2 {
+      font-size: 1.2rem;
+      color: #2d3748;
+      margin-bottom: 16px;
     }
     .chart-wrapper {
       background: #fff;
@@ -50,6 +56,105 @@
       height: 3px;
       border-top: 3px dashed;
     }
+
+    /* ── Strategic tasks section ── */
+    .strategic-wrapper {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+      padding: 28px 24px 24px;
+      width: 100%;
+      max-width: 860px;
+      border-top: 4px solid #6b46c1;
+    }
+    .strategic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #6b46c1;
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: 99px;
+      padding: 3px 10px;
+      margin-bottom: 16px;
+    }
+    .strategic-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      flex: 1 1 120px;
+      background: #f3eeff;
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: center;
+    }
+    .stat-card .stat-label {
+      font-size: 0.75rem;
+      color: #6b46c1;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .stat-card .stat-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #44337a;
+    }
+    .stat-card .stat-unit {
+      font-size: 0.75rem;
+      color: #6b46c1;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    thead tr {
+      background: #6b46c1;
+      color: #fff;
+    }
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+    tbody tr:nth-child(even) { background: #f9f5ff; }
+    tbody tr:hover { background: #ede9fe; }
+    tbody td {
+      padding: 9px 14px;
+      color: #2d3748;
+      border-bottom: 1px solid #e9d8fd;
+    }
+    .bar-cell {
+      min-width: 160px;
+    }
+    .bar-bg {
+      background: #e9d8fd;
+      border-radius: 4px;
+      height: 10px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      background: #6b46c1;
+      height: 10px;
+      border-radius: 4px;
+    }
+    .percentile-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 99px;
+      margin-left: 6px;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -69,41 +174,63 @@
     </div>
   </div>
 
+  <!-- ── Strategic (L) tasks section ── -->
+  <div class="strategic-wrapper">
+    <span class="strategic-badge">⭐ Zadania strategiczne (wycena L)</span>
+    <h2>Czasy realizacji — zadania strategiczne</h2>
+    <div class="strategic-stats" id="strategicStats"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Data ukończenia</th>
+          <th>Czas realizacji (dni)</th>
+          <th class="bar-cell">Wizualizacja</th>
+        </tr>
+      </thead>
+      <tbody id="strategicTable"></tbody>
+    </table>
+  </div>
+
   <script>
-    // ── raw data from "1 Histogram czasów realizacji.csv" ──────────────────
+    // ── raw data from "2. Scatterplot czasów realizacji.csv" ──────────────
     const rawData = [
-      {size:'S', value:49}, {size:'S', value:48}, {size:'S', value:87},
-      {size:'M', value:57}, {size:'M', value:148},
-      {size:'S', value:53}, {size:'S', value:45},
-      {size:'M', value:145},
-      {size:'L', value:105},
-      {size:'S', value:5},
-      {size:'L', value:163},
-      {size:'S', value:43},
-      {size:'M', value:415},
-      {size:'L', value:123},
-      {size:'M', value:103},
-      {size:'L', value:104},
-      {size:'L', value:302},
-      {size:'L', value:158},
-      {size:'L', value:98},
-      {size:'S', value:52},
-      {size:'M', value:95},
-      {size:'S', value:70},
-      {size:'M', value:95},
-      {size:'M', value:101},
-      {size:'M', value:57},
-      {size:'M', value:57},
-      {size:'S', value:53},
-      {size:'L', value:137},
-      {size:'S', value:73},
-      {size:'M', value:60},
-      {size:'S', value:126},
-      {size:'M', value:57},
-      {size:'L', value:124},
-      {size:'M', value:75},
-      {size:'M', value:89},
-      {size:'S', value:44},
+      {date:'15.07.2024', size:'S', value:49},
+      {date:'22.08.2024', size:'S', value:48},
+      {date:'10.09.2024', size:'S', value:87},
+      {date:'25.09.2024', size:'M', value:57},
+      {date:'5.10.2024',  size:'M', value:148},
+      {date:'14.10.2024', size:'S', value:53},
+      {date:'28.10.2024', size:'S', value:45},
+      {date:'18.11.2024', size:'M', value:145},
+      {date:'4.12.2024',  size:'L', value:105},
+      {date:'8.01.2025',  size:'S', value:5},
+      {date:'20.01.2025', size:'L', value:163},
+      {date:'14.02.2025', size:'S', value:43},
+      {date:'26.02.2025', size:'M', value:415},
+      {date:'15.03.2025', size:'L', value:123},
+      {date:'10.04.2025', size:'M', value:103},
+      {date:'5.05.2025',  size:'L', value:104},
+      {date:'12.06.2025', size:'L', value:302},
+      {date:'25.06.2025', size:'L', value:158},
+      {date:'2.07.2025',  size:'L', value:98},
+      {date:'11.07.2025', size:'S', value:52},
+      {date:'18.07.2025', size:'M', value:95},
+      {date:'29.07.2025', size:'S', value:70},
+      {date:'3.08.2025',  size:'M', value:95},
+      {date:'14.08.2025', size:'M', value:101},
+      {date:'21.08.2025', size:'M', value:57},
+      {date:'29.08.2025', size:'M', value:57},
+      {date:'8.09.2025',  size:'S', value:53},
+      {date:'22.09.2025', size:'L', value:137},
+      {date:'4.10.2025',  size:'S', value:73},
+      {date:'12.10.2025', size:'M', value:60},
+      {date:'19.10.2025', size:'S', value:126},
+      {date:'27.10.2025', size:'M', value:57},
+      {date:'5.11.2025',  size:'L', value:124},
+      {date:'15.11.2025', size:'M', value:75},
+      {date:'25.11.2025', size:'M', value:89},
+      {date:'10.12.2025', size:'S', value:44},
     ];
 
     // ── percentile helper (linear interpolation) ───────────────────────────
@@ -120,6 +247,51 @@
     const p50 = calcPercentile(allValues, 50);
     const p80 = calcPercentile(allValues, 80);
     const p95 = calcPercentile(allValues, 95);
+
+    // ── strategic (L) tasks ────────────────────────────────────────────────
+    const strategicTasks = rawData.filter(d => d.size === 'L');
+    const lValues = strategicTasks.map(d => d.value);
+    const lP50 = calcPercentile(lValues, 50);
+    const lP80 = calcPercentile(lValues, 80);
+    const lP95 = calcPercentile(lValues, 95);
+    const lMax = Math.max(...lValues);
+
+    // ── populate strategic stats cards ────────────────────────────────────
+    const statsContainer = document.getElementById('strategicStats');
+    [
+      { label: 'Liczba zadań', value: lValues.length, unit: '' },
+      { label: 'P50', value: Math.round(lP50), unit: 'dni' },
+      { label: 'P80', value: Math.round(lP80), unit: 'dni' },
+      { label: 'P95', value: Math.round(lP95), unit: 'dni' },
+    ].forEach(s => {
+      statsContainer.innerHTML += `
+        <div class="stat-card">
+          <div class="stat-label">${s.label}</div>
+          <div class="stat-value">${s.value}<span class="stat-unit"> ${s.unit}</span></div>
+        </div>`;
+    });
+
+    // ── populate strategic table ───────────────────────────────────────────
+    function percentileTag(v) {
+      if (v <= lP50) return `<span class="percentile-tag" style="background:#38a169">≤P50</span>`;
+      if (v <= lP80) return `<span class="percentile-tag" style="background:#dd6b20">≤P80</span>`;
+      if (v <= lP95) return `<span class="percentile-tag" style="background:#805ad5">≤P95</span>`;
+      return `<span class="percentile-tag" style="background:#e53e3e">&gt;P95</span>`;
+    }
+
+    const tbody = document.getElementById('strategicTable');
+    strategicTasks.forEach((task, i) => {
+      const pct = Math.round((task.value / lMax) * 100);
+      tbody.innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${task.date}</td>
+          <td>${task.value} dni ${percentileTag(task.value)}</td>
+          <td class="bar-cell">
+            <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+          </td>
+        </tr>`;
+    });
 
     // ── build bins (width = 30 days) ───────────────────────────────────────
     const BIN_WIDTH = 30;
@@ -151,17 +323,22 @@
     const sizeColors = {
       S: 'rgba(72, 187, 120, 0.85)',   // green
       M: 'rgba(66, 153, 225, 0.85)',   // blue
-      L: 'rgba(237, 137, 54, 0.85)',   // orange
+      L: 'rgba(107, 70, 193, 0.85)',   // purple – strategic
     };
     const sizeBorder = {
       S: 'rgba(47, 133, 90, 1)',
       M: 'rgba(43, 108, 176, 1)',
-      L: 'rgba(192, 86, 33, 1)',
+      L: 'rgba(68, 51, 122, 1)',       // dark purple
+    };
+    const sizeLabels = {
+      S: 'Rozmiar S',
+      M: 'Rozmiar M',
+      L: '⭐ Strategiczne (L)',
     };
 
     // ── Chart.js datasets ──────────────────────────────────────────────────
     const datasets = sizes.map(s => ({
-      label: `Rozmiar ${s}`,
+      label: sizeLabels[s],
       data: counts[s],
       backgroundColor: sizeColors[s],
       borderColor: sizeBorder[s],
