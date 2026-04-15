@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scatterplot czasów realizacji DOS</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(160deg, #fdf4ff 0%, #f3e8ff 50%, #fdf4ff 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 36px 16px 48px;
+      gap: 28px;
+    }
+
+    /* ── Nav bar ── */
+    .nav-bar {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .nav-bar a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      border-radius: 99px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-bar a.active {
+      background: #7c3aed;
+      color: #fff;
+    }
+    .nav-bar a:not(.active) {
+      background: #fff;
+      color: #6b46c1;
+      border: 1.5px solid #c4b5fd;
+    }
+    .nav-bar a:not(.active):hover {
+      background: #6b46c1;
+      color: #fff;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      text-align: center;
+    }
+    .page-header h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #3b0764;
+      letter-spacing: -0.02em;
+    }
+    .page-header p {
+      margin-top: 6px;
+      color: #6b21a8;
+      font-size: 0.95rem;
+    }
+
+    /* ── Stat cards ── */
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      width: 100%;
+      max-width: 900px;
+    }
+    .stat-card {
+      flex: 1 1 140px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px rgba(124, 58, 237, 0.15);
+      padding: 18px 20px;
+      text-align: center;
+      border-top: 4px solid #a78bfa;
+    }
+    .stat-card.p50 { border-color: #c4b5fd; }
+    .stat-card.p80 { border-color: #7c3aed; }
+    .stat-card.p95 { border-color: #3b0764; }
+    .stat-card .stat-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #6b21a8;
+      margin-bottom: 6px;
+    }
+    .stat-card .stat-value {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #3b0764;
+    }
+    .stat-card .stat-unit {
+      font-size: 0.8rem;
+      color: #6b21a8;
+      font-weight: 600;
+    }
+
+    /* ── Chart wrapper ── */
+    .chart-wrapper {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(124, 58, 237, 0.13);
+      padding: 28px 28px 20px;
+      width: 100%;
+      max-width: 900px;
+      border: 1.5px solid #e9d8fd;
+    }
+    .chart-wrapper h2 {
+      font-size: 1.1rem;
+      color: #3b0764;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    /* ── Error / loading state ── */
+    #loadingMsg {
+      color: #6b21a8;
+      font-size: 0.95rem;
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    /* ── Legend below chart ── */
+    .legend-extra {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: center;
+      margin-top: 18px;
+      font-size: 0.82rem;
+      color: #6b21a8;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.2);
+    }
+    .legend-dash {
+      width: 26px;
+      height: 0;
+      border-top: 3px dashed;
+    }
+
+    /* ── Footer ── */
+    footer {
+      color: #c4b5fd;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav-bar">
+    <a href="index.html">📊 Histogram czasów realizacji</a>
+    <a href="anna-podgorska.html">☁ Scatterplot czasów realizacji</a>
+    <a href="scatterplot.html">🌤 Scatterplot — niebo</a>
+    <a href="scatterplot2.html">🌿 Scatterplot — zieleń</a>
+    <a href="scatterplot-dos.html" class="active">💜 Scatterplot DOS</a>
+  </nav>
+
+  <header class="page-header">
+    <h1>💜 Scatterplot czasów realizacji DOS</h1>
+    <p>Czas realizacji zadań według daty ukończenia i rozmiaru (S / M / L) — dane z pliku CSV</p>
+  </header>
+
+  <!-- ── Stat cards ── -->
+  <div class="stats-row" id="statsRow"></div>
+
+  <!-- ── Scatterplot ── -->
+  <div class="chart-wrapper">
+    <h2>📈 Wykres punktowy — czas realizacji (dni)</h2>
+    <div id="loadingMsg">Ładowanie danych…</div>
+    <canvas id="scatterChart" height="420" style="display:none"></canvas>
+    <div class="legend-extra" id="legendExtra"></div>
+  </div>
+
+  <footer>Dashboard — paleta fioletu &nbsp;·&nbsp; dane: 2. Scatterplot czasów realizacji DOS.csv</footer>
+
+  <script>
+    // ── Parse date helper (DD.MM.YYYY → timestamp) ────────────────────────────
+    function parseDate(str) {
+      const [d, m, y] = str.split('.').map(Number);
+      return new Date(y, m - 1, d).getTime();
+    }
+
+    // ── Percentile helper (linear interpolation) ──────────────────────────────
+    function calcPercentile(arr, p) {
+      const sorted = [...arr].sort((a, b) => a - b);
+      const pos = (p / 100) * (sorted.length - 1);
+      const lo = Math.floor(pos);
+      const hi = Math.ceil(pos);
+      if (lo === hi) return sorted[lo];
+      return sorted[lo] + (pos - lo) * (sorted[hi] - sorted[lo]);
+    }
+
+    // ── Purple palette per size ───────────────────────────────────────────────
+    const sizeStyle = {
+      S: { bg: 'rgba(221, 214, 254, 0.9)', border: '#7c3aed', label: 'Rozmiar S' },
+      M: { bg: 'rgba(167, 139, 250, 0.85)', border: '#6d28d9', label: 'Rozmiar M' },
+      L: { bg: 'rgba( 91,  33, 182, 0.85)', border: '#3b0764', label: '⭐ Strategiczne (L)' },
+    };
+
+    const sizes = ['S', 'M', 'L'];
+
+    function renderChart(rawData) {
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('scatterChart').style.display = '';
+
+      const allValues = rawData.map(d => d.value);
+      const p50 = calcPercentile(allValues, 50);
+      const p80 = calcPercentile(allValues, 80);
+      const p95 = calcPercentile(allValues, 95);
+
+      // ── Stat cards ──────────────────────────────────────────────────────────
+      const statsRow = document.getElementById('statsRow');
+      [
+        { label: 'Liczba zadań', value: rawData.length, unit: '',     cls: '' },
+        { label: 'P50',          value: Math.round(p50), unit: 'dni', cls: 'p50' },
+        { label: 'P80',          value: Math.round(p80), unit: 'dni', cls: 'p80' },
+        { label: 'P95',          value: Math.round(p95), unit: 'dni', cls: 'p95' },
+      ].forEach(s => {
+        statsRow.innerHTML += `
+          <div class="stat-card ${s.cls}">
+            <div class="stat-label">${s.label}</div>
+            <div class="stat-value">${s.value}<span class="stat-unit">${s.unit ? ' ' + s.unit : ''}</span></div>
+          </div>`;
+      });
+
+      // ── Build scatter datasets per size ─────────────────────────────────────
+      const datasets = sizes.map(s => ({
+        label: sizeStyle[s].label,
+        data: rawData
+          .filter(d => d.size === s)
+          .map(d => ({ x: parseDate(d.date), y: d.value, _date: d.date })),
+        backgroundColor: sizeStyle[s].bg,
+        borderColor:     sizeStyle[s].border,
+        borderWidth: 1.5,
+        pointRadius: 7,
+        pointHoverRadius: 10,
+      }));
+
+      // ── X-axis range ─────────────────────────────────────────────────────────
+      const allDates = rawData.map(d => parseDate(d.date));
+      const xMin = Math.min(...allDates) - 15 * 86400000;
+      const xMax = Math.max(...allDates) + 15 * 86400000;
+
+      // ── Annotations (horizontal percentile lines) ────────────────────────────
+      function percAnnotation(value, label, color, yAdj) {
+        return {
+          type: 'line',
+          scaleID: 'y',
+          value: value,
+          borderColor: color,
+          borderWidth: 2,
+          borderDash: [7, 4],
+          label: {
+            display: true,
+            content: `${label}: ${Math.round(value)} dni`,
+            position: 'end',
+            color: '#fff',
+            backgroundColor: color,
+            font: { size: 11, weight: 'bold' },
+            padding: { x: 7, y: 4 },
+            xAdjust: -4,
+            yAdjust: yAdj,
+          },
+        };
+      }
+
+      const annotations = {
+        p50: percAnnotation(p50, 'P50', '#c4b5fd', -14),
+        p80: percAnnotation(p80, 'P80', '#7c3aed', -14),
+        p95: percAnnotation(p95, 'P95', '#3b0764', -14),
+      };
+
+      // ── Render chart ──────────────────────────────────────────────────────────
+      const ctx = document.getElementById('scatterChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'scatter',
+        data: { datasets },
+        options: {
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: '#3b0764',
+                font: { size: 12, weight: '600' },
+                usePointStyle: true,
+                pointStyleWidth: 12,
+              },
+            },
+            annotation: { annotations },
+            tooltip: {
+              callbacks: {
+                label: item => {
+                  const pt = item.raw;
+                  return ` ${item.dataset.label}  |  ${pt._date}  |  ${pt.y} dni`;
+                },
+              },
+              backgroundColor: '#3b0764',
+              titleColor: '#e9d8fd',
+              bodyColor: '#fdf4ff',
+            },
+          },
+          scales: {
+            x: {
+              type: 'linear',
+              min: xMin,
+              max: xMax,
+              ticks: {
+                color: '#6b21a8',
+                maxTicksLimit: 10,
+                callback: value => {
+                  const d = new Date(value);
+                  return d.toLocaleDateString('pl-PL', { month: 'short', year: '2-digit' });
+                },
+              },
+              grid: { color: 'rgba(196, 181, 253, 0.4)' },
+              title: {
+                display: true,
+                text: 'Data ukończenia',
+                color: '#3b0764',
+                font: { size: 13, weight: '700' },
+              },
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#6b21a8', stepSize: 50 },
+              grid: { color: 'rgba(196, 181, 253, 0.4)' },
+              title: {
+                display: true,
+                text: 'Czas realizacji (dni)',
+                color: '#3b0764',
+                font: { size: 13, weight: '700' },
+              },
+            },
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+        },
+      });
+
+      // ── Extra legend (percentile lines) ──────────────────────────────────────
+      const legendExtra = document.getElementById('legendExtra');
+      [
+        { color: '#c4b5fd', label: 'P50 — mediana' },
+        { color: '#7c3aed', label: 'P80' },
+        { color: '#3b0764', label: 'P95' },
+      ].forEach(l => {
+        legendExtra.innerHTML += `
+          <span class="legend-item">
+            <span class="legend-dash" style="border-color:${l.color}"></span>
+            <span>${l.label}</span>
+          </span>`;
+      });
+      sizes.forEach(s => {
+        legendExtra.innerHTML += `
+          <span class="legend-item">
+            <span class="legend-dot" style="background:${sizeStyle[s].bg};border-color:${sizeStyle[s].border}"></span>
+            <span>${sizeStyle[s].label}</span>
+          </span>`;
+      });
+    }
+
+    // ── Fetch and parse CSV ───────────────────────────────────────────────────
+    fetch('2.%20Scatterplot%20czas%C3%B3w%20realizacji%20DOS.csv')
+      .then(res => {
+        if (!res.ok) throw new Error('Nie udało się załadować pliku CSV.');
+        return res.text();
+      })
+      .then(text => {
+        const lines = text.trim().split('\n').slice(1); // skip header
+        const rawData = lines.map(line => {
+          const [date, size, value] = line.split(',');
+          return { date: date.trim(), size: size.trim(), value: parseInt(value.trim(), 10) };
+        }).filter(d => d.date && d.size && !isNaN(d.value));
+        renderChart(rawData);
+      })
+      .catch(err => {
+        document.getElementById('loadingMsg').textContent = '⚠️ ' + err.message;
+      });
+  </script>
+</body>
+</html>
