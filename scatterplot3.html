@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scatterplot czasów realizacji — zielony</title>
+  <title>Scatterplot czasów realizacji — zachód słońca</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
@@ -11,7 +11,7 @@
 
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(160deg, #f0fdf4 0%, #bbf7d0 50%, #f0fdf4 100%);
+      background: linear-gradient(160deg, #fff7ed 0%, #fed7aa 50%, #fff7ed 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -41,7 +41,7 @@
       transition: background 0.2s, color 0.2s;
     }
     .nav-bar a.active {
-      background: #16a34a;
+      background: #ea580c;
       color: #fff;
     }
     .nav-bar a:not(.active) {
@@ -61,12 +61,12 @@
     .page-header h1 {
       font-size: 1.8rem;
       font-weight: 800;
-      color: #14532d;
+      color: #7c2d12;
       letter-spacing: -0.02em;
     }
     .page-header p {
       margin-top: 6px;
-      color: #15803d;
+      color: #c2410c;
       font-size: 0.95rem;
     }
 
@@ -83,30 +83,30 @@
       flex: 1 1 140px;
       background: #fff;
       border-radius: 14px;
-      box-shadow: 0 2px 14px rgba(22, 163, 74, 0.15);
+      box-shadow: 0 2px 14px rgba(234, 88, 12, 0.15);
       padding: 18px 20px;
       text-align: center;
-      border-top: 4px solid #4ade80;
+      border-top: 4px solid #fb923c;
     }
-    .stat-card.p50 { border-color: #86efac; }
-    .stat-card.p80 { border-color: #16a34a; }
-    .stat-card.p95 { border-color: #14532d; }
+    .stat-card.p50 { border-color: #fdba74; }
+    .stat-card.p80 { border-color: #ea580c; }
+    .stat-card.p95 { border-color: #7c2d12; }
     .stat-card .stat-label {
       font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      color: #15803d;
+      color: #c2410c;
       margin-bottom: 6px;
     }
     .stat-card .stat-value {
       font-size: 1.7rem;
       font-weight: 800;
-      color: #14532d;
+      color: #7c2d12;
     }
     .stat-card .stat-unit {
       font-size: 0.8rem;
-      color: #15803d;
+      color: #c2410c;
       font-weight: 600;
     }
 
@@ -114,15 +114,15 @@
     .chart-wrapper {
       background: #fff;
       border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(22, 163, 74, 0.13);
+      box-shadow: 0 4px 24px rgba(234, 88, 12, 0.13);
       padding: 28px 28px 20px;
       width: 100%;
       max-width: 900px;
-      border: 1.5px solid #bbf7d0;
+      border: 1.5px solid #fed7aa;
     }
     .chart-wrapper h2 {
       font-size: 1.1rem;
-      color: #14532d;
+      color: #7c2d12;
       font-weight: 700;
       margin-bottom: 18px;
     }
@@ -135,7 +135,7 @@
       justify-content: center;
       margin-top: 18px;
       font-size: 0.82rem;
-      color: #15803d;
+      color: #c2410c;
     }
     .legend-item {
       display: flex;
@@ -156,7 +156,7 @@
 
     /* ── Footer ── */
     footer {
-      color: #86efac;
+      color: #fdba74;
       font-size: 0.78rem;
       text-align: center;
     }
@@ -168,13 +168,13 @@
     <a href="index.html">📊 Histogram czasów realizacji</a>
     <a href="anna-podgorska.html">☁ Scatterplot czasów realizacji</a>
     <a href="scatterplot.html">🌤 Scatterplot — niebo</a>
-    <a href="scatterplot2.html" class="active">🌿 Scatterplot — zieleń</a>
-    <a href="scatterplot3.html">🌅 Scatterplot — zachód słońca</a>
+    <a href="scatterplot2.html">🌿 Scatterplot — zieleń</a>
+    <a href="scatterplot3.html" class="active">🌅 Scatterplot — zachód słońca</a>
   </nav>
 
   <header class="page-header">
-    <h1>🌿 Scatterplot czasów realizacji</h1>
-    <p>Czas realizacji zadań według daty ukończenia i rozmiaru (S / M / L) — paleta zieleni</p>
+    <h1>🌅 Scatterplot czasów realizacji</h1>
+    <p>Czas realizacji zadań według daty ukończenia i rozmiaru (S / M / L) — paleta zachodu słońca</p>
   </header>
 
   <!-- ── Stat cards ── -->
@@ -187,7 +187,7 @@
     <div class="legend-extra" id="legendExtra"></div>
   </div>
 
-  <footer>Dashboard w odcieniach zieleni &nbsp;·&nbsp; dane: 2. Scatterplot czasów realizacji.csv</footer>
+  <footer>Dashboard w odcieniach zachodu słońca &nbsp;·&nbsp; dane: 2. Scatterplot czasów realizacji.csv</footer>
 
   <script>
     // ── Raw data from "2. Scatterplot czasów realizacji.csv" ──────────────────
@@ -266,11 +266,11 @@
         </div>`;
     });
 
-    // ── Green palette per size ────────────────────────────────────────────────
+    // ── Sunset palette per size ───────────────────────────────────────────────
     const sizeStyle = {
-      S: { bg: 'rgba(187, 247, 208, 0.9)', border: '#16a34a', label: 'Rozmiar S' },
-      M: { bg: 'rgba( 74, 222, 128, 0.85)', border: '#15803d', label: 'Rozmiar M' },
-      L: { bg: 'rgba( 21, 128,  61, 0.85)', border: '#14532d', label: '⭐ Strategiczne (L)' },
+      S: { bg: 'rgba(253, 186, 116, 0.9)', border: '#f97316', label: 'Rozmiar S' },
+      M: { bg: 'rgba(249, 115,  22, 0.85)', border: '#ea580c', label: 'Rozmiar M' },
+      L: { bg: 'rgba(124,  45,  18, 0.85)', border: '#7c2d12', label: '⭐ Strategiczne (L)' },
     };
 
     // ── Build scatter datasets per size ───────────────────────────────────────
@@ -316,9 +316,9 @@
     }
 
     const annotations = {
-      p50: percAnnotation(p50, 'P50', '#86efac', -14),
-      p80: percAnnotation(p80, 'P80', '#16a34a', -14),
-      p95: percAnnotation(p95, 'P95', '#14532d', -14),
+      p50: percAnnotation(p50, 'P50', '#fdba74', -14),
+      p80: percAnnotation(p80, 'P80', '#ea580c', -14),
+      p95: percAnnotation(p95, 'P95', '#7c2d12', -14),
     };
 
     // ── Render chart ──────────────────────────────────────────────────────────
@@ -331,7 +331,7 @@
           legend: {
             position: 'top',
             labels: {
-              color: '#14532d',
+              color: '#7c2d12',
               font: { size: 12, weight: '600' },
               usePointStyle: true,
               pointStyleWidth: 12,
@@ -345,9 +345,9 @@
                 return ` ${item.dataset.label}  |  ${pt._date}  |  ${pt.y} dni`;
               },
             },
-            backgroundColor: '#14532d',
-            titleColor: '#bbf7d0',
-            bodyColor: '#f0fdf4',
+            backgroundColor: '#7c2d12',
+            titleColor: '#fed7aa',
+            bodyColor: '#fff7ed',
           },
         },
         scales: {
@@ -356,29 +356,29 @@
             min: xMin,
             max: xMax,
             ticks: {
-              color: '#15803d',
+              color: '#c2410c',
               maxTicksLimit: 10,
               callback: value => {
                 const d = new Date(value);
                 return d.toLocaleDateString('pl-PL', { month: 'short', year: '2-digit' });
               },
             },
-            grid: { color: 'rgba(187, 247, 208, 0.5)' },
+            grid: { color: 'rgba(253, 186, 116, 0.5)' },
             title: {
               display: true,
               text: 'Data ukończenia',
-              color: '#14532d',
+              color: '#7c2d12',
               font: { size: 13, weight: '700' },
             },
           },
           y: {
             beginAtZero: true,
-            ticks: { color: '#15803d', stepSize: 50 },
-            grid: { color: 'rgba(187, 247, 208, 0.5)' },
+            ticks: { color: '#c2410c', stepSize: 50 },
+            grid: { color: 'rgba(253, 186, 116, 0.5)' },
             title: {
               display: true,
               text: 'Czas realizacji (dni)',
-              color: '#14532d',
+              color: '#7c2d12',
               font: { size: 13, weight: '700' },
             },
           },
@@ -391,9 +391,9 @@
     // ── Extra legend (percentile lines) ──────────────────────────────────────
     const legendExtra = document.getElementById('legendExtra');
     [
-      { color: '#86efac', label: 'P50 — mediana' },
-      { color: '#16a34a', label: 'P80' },
-      { color: '#14532d', label: 'P95' },
+      { color: '#fdba74', label: 'P50 — mediana' },
+      { color: '#ea580c', label: 'P80' },
+      { color: '#7c2d12', label: 'P95' },
     ].forEach(l => {
       legendExtra.innerHTML += `
         <span class="legend-item">
