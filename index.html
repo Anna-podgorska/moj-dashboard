@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Histogram czasów realizacji</title>
+  <title>Dashboard – czasy realizacji</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -16,11 +17,18 @@
       align-items: center;
       padding: 32px 16px;
       min-height: 100vh;
+      gap: 32px;
     }
     h1 {
       font-size: 1.5rem;
       color: #2d3748;
-      margin-bottom: 24px;
+      margin-bottom: 0;
+      text-align: center;
+    }
+    h2 {
+      font-size: 1.15rem;
+      color: #2d3748;
+      margin-bottom: 16px;
       text-align: center;
     }
     .chart-wrapper {
@@ -53,8 +61,11 @@
   </style>
 </head>
 <body>
-  <h1>Histogram czasów realizacji</h1>
+  <h1>Dashboard – czasy realizacji</h1>
+
+  <!-- 1. Histogram -->
   <div class="chart-wrapper">
+    <h2>Histogram czasów realizacji</h2>
     <canvas id="histChart"></canvas>
     <div class="legend-extra">
       <span class="legend-item">
@@ -67,6 +78,43 @@
         <span class="legend-line" style="border-color:#805ad5;"></span>P95
       </span>
     </div>
+  </div>
+
+  <!-- 2. Scatterplot -->
+  <div class="chart-wrapper">
+    <h2>Scatterplot czasów realizacji</h2>
+    <canvas id="scatterChart"></canvas>
+    <div class="legend-extra">
+      <span class="legend-item">
+        <span class="legend-line" style="border-color:#e53e3e;"></span>P50
+      </span>
+      <span class="legend-item">
+        <span class="legend-line" style="border-color:#dd6b20;"></span>P80
+      </span>
+      <span class="legend-item">
+        <span class="legend-line" style="border-color:#805ad5;"></span>P95
+      </span>
+    </div>
+  </div>
+
+  <!-- 3. PCB – Process Control Chart -->
+  <div class="chart-wrapper">
+    <h2>Wykres kontrolny procesu (PCB)</h2>
+    <canvas id="pcbChart"></canvas>
+    <div class="legend-extra">
+      <span class="legend-item">
+        <span class="legend-line" style="border-color:#38a169;"></span>Średnia
+      </span>
+      <span class="legend-item">
+        <span class="legend-line" style="border-color:#e53e3e;"></span>UCL
+      </span>
+    </div>
+  </div>
+
+  <!-- 4. Tempo dostarczania dzienne -->
+  <div class="chart-wrapper">
+    <h2>Tempo dostarczania dzienne</h2>
+    <canvas id="throughputChart"></canvas>
   </div>
 
   <script>
@@ -222,6 +270,320 @@
             beginAtZero: true,
             ticks: { stepSize: 1, precision: 0 },
             title: { display: true, text: 'Liczba zadań', font: { size: 13 } },
+          },
+        },
+        responsive: true,
+        maintainAspectRatio: true,
+      },
+    });
+
+    // ════════════════════════════════════════════════════════════════════════
+    // 2. SCATTERPLOT – raw data from "2. Scatterplot czasów realizacji.csv"
+    // ════════════════════════════════════════════════════════════════════════
+    const scatterRaw = [
+      {date:'15.07.2024', size:'S', value:49},
+      {date:'22.08.2024', size:'S', value:48},
+      {date:'10.09.2024', size:'S', value:87},
+      {date:'25.09.2024', size:'M', value:57},
+      {date:'5.10.2024',  size:'M', value:148},
+      {date:'14.10.2024', size:'S', value:53},
+      {date:'28.10.2024', size:'S', value:45},
+      {date:'18.11.2024', size:'M', value:145},
+      {date:'4.12.2024',  size:'L', value:105},
+      {date:'8.01.2025',  size:'S', value:5},
+      {date:'20.01.2025', size:'L', value:163},
+      {date:'14.02.2025', size:'S', value:43},
+      {date:'26.02.2025', size:'M', value:415},
+      {date:'15.03.2025', size:'L', value:123},
+      {date:'10.04.2025', size:'M', value:103},
+      {date:'5.05.2025',  size:'L', value:104},
+      {date:'12.06.2025', size:'L', value:302},
+      {date:'25.06.2025', size:'L', value:158},
+      {date:'2.07.2025',  size:'L', value:98},
+      {date:'11.07.2025', size:'S', value:52},
+      {date:'18.07.2025', size:'M', value:95},
+      {date:'29.07.2025', size:'S', value:70},
+      {date:'3.08.2025',  size:'M', value:95},
+      {date:'14.08.2025', size:'M', value:101},
+      {date:'21.08.2025', size:'M', value:57},
+      {date:'29.08.2025', size:'M', value:57},
+      {date:'8.09.2025',  size:'S', value:53},
+      {date:'22.09.2025', size:'L', value:137},
+      {date:'4.10.2025',  size:'S', value:73},
+      {date:'12.10.2025', size:'M', value:60},
+      {date:'19.10.2025', size:'S', value:126},
+      {date:'27.10.2025', size:'M', value:57},
+      {date:'5.11.2025',  size:'L', value:124},
+      {date:'15.11.2025', size:'M', value:75},
+      {date:'25.11.2025', size:'M', value:89},
+      {date:'10.12.2025', size:'S', value:44},
+    ];
+
+    function parseDate(str) {
+      const parts = str.split('.');
+      return new Date(+parts[2], +parts[1] - 1, +parts[0]);
+    }
+
+    const scatterBySize = {};
+    sizes.forEach(s => { scatterBySize[s] = []; });
+    scatterRaw.forEach(d => {
+      scatterBySize[d.size].push({ x: parseDate(d.date), y: d.value });
+    });
+
+    const scatterDatasets = sizes.map(s => ({
+      label: `Rozmiar ${s}`,
+      data: scatterBySize[s],
+      backgroundColor: sizeColors[s],
+      borderColor: sizeBorder[s],
+      pointRadius: 7,
+      pointHoverRadius: 9,
+    }));
+
+    const scatterAllValues = scatterRaw.map(d => d.value);
+    const sp50 = calcPercentile(scatterAllValues, 50);
+    const sp80 = calcPercentile(scatterAllValues, 80);
+    const sp95 = calcPercentile(scatterAllValues, 95);
+
+    function yLineAnnotation(value, label, color) {
+      return {
+        type: 'line',
+        scaleID: 'y',
+        value,
+        borderColor: color,
+        borderWidth: 2.5,
+        borderDash: [6, 4],
+        label: {
+          display: true,
+          content: `${label}: ${Math.round(value)} dni`,
+          position: 'end',
+          color: '#fff',
+          backgroundColor: color,
+          font: { size: 11, weight: 'bold' },
+          padding: { x: 6, y: 4 },
+        },
+      };
+    }
+
+    new Chart(document.getElementById('scatterChart').getContext('2d'), {
+      type: 'scatter',
+      data: { datasets: scatterDatasets },
+      options: {
+        plugins: {
+          legend: { position: 'top' },
+          annotation: {
+            annotations: {
+              sp50line: yLineAnnotation(sp50, 'P50', '#e53e3e'),
+              sp80line: yLineAnnotation(sp80, 'P80', '#dd6b20'),
+              sp95line: yLineAnnotation(sp95, 'P95', '#805ad5'),
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: item => {
+                const d = item.raw;
+                const date = d.x.toLocaleDateString('pl-PL');
+                return ` ${item.dataset.label}: ${d.y} dni (${date})`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: { unit: 'month', tooltipFormat: 'dd.MM.yyyy', displayFormats: { month: 'MM.yyyy' } },
+            title: { display: true, text: 'Data ukończenia', font: { size: 13 } },
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Czas realizacji (dni)', font: { size: 13 } },
+          },
+        },
+        responsive: true,
+        maintainAspectRatio: true,
+      },
+    });
+
+    // ════════════════════════════════════════════════════════════════════════
+    // 3. PCB – data from "3. PCB Czas realizacji.csv"
+    // ════════════════════════════════════════════════════════════════════════
+    const pcbRaw = [
+      {id:1,  closed:'1.5.2024',   ct:38},
+      {id:2,  closed:'1.11.2024',  ct:24},
+      {id:3,  closed:'1.16.2024',  ct:14},
+      {id:4,  closed:'1.17.2024',  ct:9},
+      {id:5,  closed:'1.22.2024',  ct:4},
+      {id:6,  closed:'1.26.2024',  ct:25},
+      {id:7,  closed:'1.29.2024',  ct:19},
+      {id:8,  closed:'2.6.2024',   ct:51},
+      {id:9,  closed:'2.12.2024',  ct:48},
+      {id:10, closed:'2.15.2024',  ct:15},
+      {id:11, closed:'2.17.2024',  ct:22},
+      {id:12, closed:'2.18.2024',  ct:42},
+      {id:13, closed:'2.19.2024',  ct:17},
+      {id:14, closed:'2.21.2024',  ct:7},
+      {id:15, closed:'2.28.2024',  ct:5},
+      {id:16, closed:'3.12.2024',  ct:20},
+      {id:17, closed:'3.14.2024',  ct:63},
+      {id:18, closed:'3.19.2024',  ct:6},
+      {id:19, closed:'3.20.2024',  ct:56},
+      {id:20, closed:'3.22.2024',  ct:24},
+      {id:21, closed:'3.22.2024',  ct:22},
+      {id:22, closed:'3.26.2024',  ct:50},
+      {id:23, closed:'3.27.2024',  ct:8},
+      {id:24, closed:'3.28.2024',  ct:2},
+      {id:25, closed:'3.29.2024',  ct:3},
+      {id:26, closed:'3.30.2024',  ct:8},
+      {id:27, closed:'4.1.2024',   ct:36},
+      {id:28, closed:'4.2.2024',   ct:27},
+      {id:29, closed:'4.9.2024',   ct:29},
+      {id:30, closed:'4.9.2024',   ct:20},
+    ];
+
+    function parseMDY(str) {
+      const parts = str.split('.');
+      return new Date(+parts[2], +parts[0] - 1, +parts[1]);
+    }
+
+    const pcbValues = pcbRaw.map(d => d.ct);
+    const pcbMean = pcbValues.reduce((a, b) => a + b, 0) / pcbValues.length;
+    const pcbMR = pcbValues.slice(1).map((v, i) => Math.abs(v - pcbValues[i]));
+    const pcbMRbar = pcbMR.reduce((a, b) => a + b, 0) / pcbMR.length;
+    const pcbUCL = pcbMean + 2.66 * pcbMRbar;
+
+    const pcbPoints = pcbRaw.map(d => ({ x: parseMDY(d.closed), y: d.ct, id: d.id }));
+
+    new Chart(document.getElementById('pcbChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            label: 'Czas realizacji',
+            data: pcbPoints,
+            borderColor: 'rgba(66,153,225,1)',
+            backgroundColor: 'rgba(66,153,225,0.15)',
+            pointBackgroundColor: pcbPoints.map(p => p.y > pcbUCL ? '#e53e3e' : 'rgba(66,153,225,1)'),
+            pointRadius: 5,
+            tension: 0.2,
+            fill: false,
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          legend: { position: 'top' },
+          annotation: {
+            annotations: {
+              meanLine: {
+                type: 'line', scaleID: 'y', value: pcbMean,
+                borderColor: '#38a169', borderWidth: 2, borderDash: [6, 4],
+                label: { display: true, content: `Średnia: ${pcbMean.toFixed(1)} dni`, position: 'start', color: '#fff', backgroundColor: '#38a169', font: { size: 11, weight: 'bold' }, padding: { x: 6, y: 4 } },
+              },
+              uclLine: {
+                type: 'line', scaleID: 'y', value: pcbUCL,
+                borderColor: '#e53e3e', borderWidth: 2, borderDash: [6, 4],
+                label: { display: true, content: `UCL: ${pcbUCL.toFixed(1)} dni`, position: 'start', color: '#fff', backgroundColor: '#e53e3e', font: { size: 11, weight: 'bold' }, padding: { x: 6, y: 4 }, yAdjust: -6 },
+              },
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: item => ` #${item.raw.id}: ${item.raw.y} dni`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: { unit: 'month', tooltipFormat: 'dd.MM.yyyy', displayFormats: { month: 'MM.yyyy' } },
+            title: { display: true, text: 'Data ukończenia', font: { size: 13 } },
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Cycle Time (dni)', font: { size: 13 } },
+          },
+        },
+        responsive: true,
+        maintainAspectRatio: true,
+      },
+    });
+
+    // ════════════════════════════════════════════════════════════════════════
+    // 4. THROUGHPUT – data from "4. Tempo dostarczania dzienne.csv"
+    // ════════════════════════════════════════════════════════════════════════
+    const throughputRaw = [
+      {date:'07.01.2025', val:0},  {date:'08.01.2025', val:2},  {date:'09.01.2025', val:10},
+      {date:'10.01.2025', val:3},  {date:'11.01.2025', val:0},  {date:'12.01.2025', val:0},
+      {date:'13.01.2025', val:2},  {date:'14.01.2025', val:3},  {date:'15.01.2025', val:7},
+      {date:'16.01.2025', val:0},  {date:'17.01.2025', val:0},  {date:'18.01.2025', val:0},
+      {date:'19.01.2025', val:0},  {date:'20.01.2025', val:5},  {date:'21.01.2025', val:2},
+      {date:'22.01.2025', val:0},  {date:'23.01.2025', val:0},  {date:'24.01.2025', val:0},
+      {date:'25.01.2025', val:0},  {date:'26.01.2025', val:0},  {date:'27.01.2025', val:1},
+      {date:'28.01.2025', val:1},  {date:'29.01.2025', val:0},  {date:'30.01.2025', val:5},
+      {date:'31.01.2025', val:4},  {date:'01.02.2025', val:0},  {date:'02.02.2025', val:0},
+      {date:'03.02.2025', val:7},  {date:'04.02.2025', val:0},  {date:'05.02.2025', val:2},
+      {date:'06.02.2025', val:2},  {date:'07.02.2025', val:12}, {date:'08.02.2025', val:0},
+      {date:'09.02.2025', val:0},  {date:'10.02.2025', val:1},  {date:'11.02.2025', val:0},
+      {date:'12.02.2025', val:0},  {date:'13.02.2025', val:2},  {date:'14.02.2025', val:12},
+      {date:'15.02.2025', val:0},  {date:'16.02.2025', val:0},  {date:'17.02.2025', val:1},
+      {date:'18.02.2025', val:0},  {date:'19.02.2025', val:0},  {date:'20.02.2025', val:3},
+      {date:'21.02.2025', val:11}, {date:'22.02.2025', val:0},  {date:'23.02.2025', val:0},
+      {date:'24.02.2025', val:6},  {date:'25.02.2025', val:0},  {date:'26.02.2025', val:0},
+      {date:'27.02.2025', val:6},  {date:'28.02.2025', val:7},  {date:'01.03.2025', val:0},
+      {date:'02.03.2025', val:0},  {date:'03.03.2025', val:2},  {date:'04.03.2025', val:0},
+      {date:'05.03.2025', val:0},  {date:'06.03.2025', val:3},  {date:'07.03.2025', val:5},
+      {date:'08.03.2025', val:0},  {date:'09.03.2025', val:0},  {date:'10.03.2025', val:1},
+      {date:'11.03.2025', val:0},  {date:'12.03.2025', val:0},  {date:'13.03.2025', val:9},
+      {date:'14.03.2025', val:7},  {date:'15.03.2025', val:0},  {date:'16.03.2025', val:0},
+      {date:'17.03.2025', val:3},  {date:'18.03.2025', val:0},  {date:'19.03.2025', val:0},
+      {date:'20.03.2025', val:4},  {date:'21.03.2025', val:10}, {date:'22.03.2025', val:0},
+      {date:'23.03.2025', val:0},  {date:'24.03.2025', val:1},  {date:'25.03.2025', val:0},
+      {date:'26.03.2025', val:0},  {date:'27.03.2025', val:5},  {date:'28.03.2025', val:1},
+      {date:'29.03.2025', val:0},  {date:'30.03.2025', val:0},  {date:'31.03.2025', val:2},
+      {date:'01.04.2025', val:0},  {date:'02.04.2025', val:0},  {date:'03.04.2025', val:2},
+      {date:'04.04.2025', val:11}, {date:'05.04.2025', val:0},  {date:'06.04.2025', val:0},
+      {date:'07.04.2025', val:1},  {date:'08.04.2025', val:0},  {date:'09.04.2025', val:0},
+      {date:'10.04.2025', val:5},  {date:'11.04.2025', val:2},  {date:'12.04.2025', val:0},
+      {date:'13.04.2025', val:0},  {date:'14.04.2025', val:1},  {date:'15.04.2025', val:0},
+      {date:'16.04.2025', val:0},  {date:'17.04.2025', val:4},  {date:'18.04.2025', val:7},
+      {date:'19.04.2025', val:0},
+    ];
+
+    const throughputPoints = throughputRaw.map(d => {
+      const parts = d.date.split('.');
+      return { x: new Date(+parts[2], +parts[1] - 1, +parts[0]), y: d.val };
+    });
+
+    new Chart(document.getElementById('throughputChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        datasets: [{
+          label: 'Przepustowość',
+          data: throughputPoints,
+          backgroundColor: 'rgba(66,153,225,0.75)',
+          borderColor: 'rgba(43,108,176,1)',
+          borderWidth: 1,
+        }],
+      },
+      options: {
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: {
+            callbacks: {
+              title: items => items[0].raw.x.toLocaleDateString('pl-PL'),
+              label: item => ` Przepustowość: ${item.raw.y}`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: { unit: 'week', tooltipFormat: 'dd.MM.yyyy', displayFormats: { week: 'dd.MM' } },
+            title: { display: true, text: 'Data', font: { size: 13 } },
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1, precision: 0 },
+            title: { display: true, text: 'Liczba dostarczonych zadań', font: { size: 13 } },
           },
         },
         responsive: true,
