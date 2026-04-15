@@ -20,6 +20,40 @@
       gap: 28px;
     }
 
+    /* ── Nav bar ── */
+    .nav-bar {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .nav-bar a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      border-radius: 99px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-bar a.active {
+      background: #0284c7;
+      color: #fff;
+    }
+    .nav-bar a:not(.active) {
+      background: #fff;
+      color: #6b46c1;
+      border: 1.5px solid #c4b5fd;
+    }
+    .nav-bar a:not(.active):hover {
+      background: #6b46c1;
+      color: #fff;
+    }
+
     /* ── Header ── */
     .page-header {
       text-align: center;
@@ -129,6 +163,11 @@
   </style>
 </head>
 <body>
+
+  <nav class="nav-bar">
+    <a href="index.html">📊 Histogram czasów realizacji</a>
+    <a href="anna-podgorska.html" class="active">☁ Scatterplot czasów realizacji</a>
+  </nav>
 
   <header class="page-header">
     <h1>☁ Scatterplot czasów realizacji</h1>

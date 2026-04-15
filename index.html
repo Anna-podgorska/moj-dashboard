@@ -8,6 +8,39 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    .nav-bar {
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .nav-bar a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      border-radius: 99px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-bar a.active {
+      background: #6b46c1;
+      color: #fff;
+    }
+    .nav-bar a:not(.active) {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1.5px solid #bae6fd;
+    }
+    .nav-bar a:not(.active):hover {
+      background: #0ea5e9;
+      color: #fff;
+    }
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #f5f7fa;
@@ -158,6 +191,10 @@
   </style>
 </head>
 <body>
+  <nav class="nav-bar">
+    <a href="index.html" class="active">📊 Histogram czasów realizacji</a>
+    <a href="anna-podgorska.html">☁ Scatterplot czasów realizacji</a>
+  </nav>
   <h1>Histogram czasów realizacji</h1>
   <div class="chart-wrapper">
     <canvas id="histChart"></canvas>
