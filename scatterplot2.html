@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scatterplot czasów realizacji</title>
+  <title>Scatterplot czasów realizacji — zielony</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
@@ -11,7 +11,7 @@
 
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(160deg, #e0f2fe 0%, #bae6fd 50%, #e0f2fe 100%);
+      background: linear-gradient(160deg, #f0fdf4 0%, #bbf7d0 50%, #f0fdf4 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -41,7 +41,7 @@
       transition: background 0.2s, color 0.2s;
     }
     .nav-bar a.active {
-      background: #0284c7;
+      background: #16a34a;
       color: #fff;
     }
     .nav-bar a:not(.active) {
@@ -61,12 +61,12 @@
     .page-header h1 {
       font-size: 1.8rem;
       font-weight: 800;
-      color: #0c4a6e;
+      color: #14532d;
       letter-spacing: -0.02em;
     }
     .page-header p {
       margin-top: 6px;
-      color: #0369a1;
+      color: #15803d;
       font-size: 0.95rem;
     }
 
@@ -83,30 +83,30 @@
       flex: 1 1 140px;
       background: #fff;
       border-radius: 14px;
-      box-shadow: 0 2px 14px rgba(2, 132, 199, 0.15);
+      box-shadow: 0 2px 14px rgba(22, 163, 74, 0.15);
       padding: 18px 20px;
       text-align: center;
-      border-top: 4px solid #0ea5e9;
+      border-top: 4px solid #4ade80;
     }
-    .stat-card.p50 { border-color: #38bdf8; }
-    .stat-card.p80 { border-color: #0284c7; }
-    .stat-card.p95 { border-color: #0c4a6e; }
+    .stat-card.p50 { border-color: #86efac; }
+    .stat-card.p80 { border-color: #16a34a; }
+    .stat-card.p95 { border-color: #14532d; }
     .stat-card .stat-label {
       font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      color: #0369a1;
+      color: #15803d;
       margin-bottom: 6px;
     }
     .stat-card .stat-value {
       font-size: 1.7rem;
       font-weight: 800;
-      color: #0c4a6e;
+      color: #14532d;
     }
     .stat-card .stat-unit {
       font-size: 0.8rem;
-      color: #0369a1;
+      color: #15803d;
       font-weight: 600;
     }
 
@@ -114,15 +114,15 @@
     .chart-wrapper {
       background: #fff;
       border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(2, 132, 199, 0.13);
+      box-shadow: 0 4px 24px rgba(22, 163, 74, 0.13);
       padding: 28px 28px 20px;
       width: 100%;
       max-width: 900px;
-      border: 1.5px solid #bae6fd;
+      border: 1.5px solid #bbf7d0;
     }
     .chart-wrapper h2 {
       font-size: 1.1rem;
-      color: #0c4a6e;
+      color: #14532d;
       font-weight: 700;
       margin-bottom: 18px;
     }
@@ -135,7 +135,7 @@
       justify-content: center;
       margin-top: 18px;
       font-size: 0.82rem;
-      color: #0369a1;
+      color: #15803d;
     }
     .legend-item {
       display: flex;
@@ -156,7 +156,7 @@
 
     /* ── Footer ── */
     footer {
-      color: #7dd3fc;
+      color: #86efac;
       font-size: 0.78rem;
       text-align: center;
     }
@@ -166,14 +166,14 @@
 
   <nav class="nav-bar">
     <a href="index.html">📊 Histogram czasów realizacji</a>
-    <a href="anna-podgorska.html" class="active">☁ Scatterplot czasów realizacji</a>
+    <a href="anna-podgorska.html">☁ Scatterplot czasów realizacji</a>
     <a href="scatterplot.html">🌤 Scatterplot — niebo</a>
-    <a href="scatterplot2.html">🌿 Scatterplot — zieleń</a>
+    <a href="scatterplot2.html" class="active">🌿 Scatterplot — zieleń</a>
   </nav>
 
   <header class="page-header">
-    <h1>☁ Scatterplot czasów realizacji</h1>
-    <p>Czas realizacji zadań według daty ukończenia i rozmiaru (S / M / L)</p>
+    <h1>🌿 Scatterplot czasów realizacji</h1>
+    <p>Czas realizacji zadań według daty ukończenia i rozmiaru (S / M / L) — paleta zieleni</p>
   </header>
 
   <!-- ── Stat cards ── -->
@@ -181,15 +181,15 @@
 
   <!-- ── Scatterplot ── -->
   <div class="chart-wrapper">
-    <h2>📊 Wykres punktowy — czas realizacji (dni)</h2>
+    <h2>📈 Wykres punktowy — czas realizacji (dni)</h2>
     <canvas id="scatterChart" height="420"></canvas>
     <div class="legend-extra" id="legendExtra"></div>
   </div>
 
-  <footer>Dashboard w odcieniach nieba &nbsp;·&nbsp; dane: Scatterplot czasów realizacji.csv</footer>
+  <footer>Dashboard w odcieniach zieleni &nbsp;·&nbsp; dane: 2. Scatterplot czasów realizacji.csv</footer>
 
   <script>
-    // ── Raw data ──────────────────────────────────────────────────────────────
+    // ── Raw data from "2. Scatterplot czasów realizacji.csv" ──────────────────
     const rawData = [
       {date:'15.07.2024', size:'S', value:49},
       {date:'22.08.2024', size:'S', value:48},
@@ -229,13 +229,13 @@
       {date:'10.12.2025', size:'S', value:44},
     ];
 
-    // ── Parse date helper (DD.MM.YYYY → timestamp) ───────────────────────────
+    // ── Parse date helper (DD.MM.YYYY → timestamp) ────────────────────────────
     function parseDate(str) {
       const [d, m, y] = str.split('.').map(Number);
       return new Date(y, m - 1, d).getTime();
     }
 
-    // ── Percentile helper ─────────────────────────────────────────────────────
+    // ── Percentile helper (linear interpolation) ──────────────────────────────
     function calcPercentile(arr, p) {
       const sorted = [...arr].sort((a, b) => a - b);
       const pos = (p / 100) * (sorted.length - 1);
@@ -265,11 +265,11 @@
         </div>`;
     });
 
-    // ── Sky-blue palette per size ─────────────────────────────────────────────
+    // ── Green palette per size ────────────────────────────────────────────────
     const sizeStyle = {
-      S: { bg: 'rgba(125, 211, 252, 0.85)', border: '#0284c7', label: 'Rozmiar S' },
-      M: { bg: 'rgba( 56, 189, 248, 0.85)', border: '#0369a1', label: 'Rozmiar M' },
-      L: { bg: 'rgba( 14, 165, 233, 0.85)', border: '#0c4a6e', label: '⭐ Strategiczne (L)' },
+      S: { bg: 'rgba(187, 247, 208, 0.9)', border: '#16a34a', label: 'Rozmiar S' },
+      M: { bg: 'rgba( 74, 222, 128, 0.85)', border: '#15803d', label: 'Rozmiar M' },
+      L: { bg: 'rgba( 21, 128,  61, 0.85)', border: '#14532d', label: '⭐ Strategiczne (L)' },
     };
 
     // ── Build scatter datasets per size ───────────────────────────────────────
@@ -315,9 +315,9 @@
     }
 
     const annotations = {
-      p50: percAnnotation(p50, 'P50', '#38bdf8',  -14),
-      p80: percAnnotation(p80, 'P80', '#0284c7',  -14),
-      p95: percAnnotation(p95, 'P95', '#0c4a6e',  -14),
+      p50: percAnnotation(p50, 'P50', '#86efac', -14),
+      p80: percAnnotation(p80, 'P80', '#16a34a', -14),
+      p95: percAnnotation(p95, 'P95', '#14532d', -14),
     };
 
     // ── Render chart ──────────────────────────────────────────────────────────
@@ -330,7 +330,7 @@
           legend: {
             position: 'top',
             labels: {
-              color: '#0c4a6e',
+              color: '#14532d',
               font: { size: 12, weight: '600' },
               usePointStyle: true,
               pointStyleWidth: 12,
@@ -344,9 +344,9 @@
                 return ` ${item.dataset.label}  |  ${pt._date}  |  ${pt.y} dni`;
               },
             },
-            backgroundColor: '#0c4a6e',
-            titleColor: '#bae6fd',
-            bodyColor: '#e0f2fe',
+            backgroundColor: '#14532d',
+            titleColor: '#bbf7d0',
+            bodyColor: '#f0fdf4',
           },
         },
         scales: {
@@ -355,29 +355,29 @@
             min: xMin,
             max: xMax,
             ticks: {
-              color: '#0369a1',
+              color: '#15803d',
               maxTicksLimit: 10,
               callback: value => {
                 const d = new Date(value);
                 return d.toLocaleDateString('pl-PL', { month: 'short', year: '2-digit' });
               },
             },
-            grid: { color: 'rgba(186, 230, 253, 0.5)' },
+            grid: { color: 'rgba(187, 247, 208, 0.5)' },
             title: {
               display: true,
               text: 'Data ukończenia',
-              color: '#0c4a6e',
+              color: '#14532d',
               font: { size: 13, weight: '700' },
             },
           },
           y: {
             beginAtZero: true,
-            ticks: { color: '#0369a1', stepSize: 50 },
-            grid: { color: 'rgba(186, 230, 253, 0.5)' },
+            ticks: { color: '#15803d', stepSize: 50 },
+            grid: { color: 'rgba(187, 247, 208, 0.5)' },
             title: {
               display: true,
               text: 'Czas realizacji (dni)',
-              color: '#0c4a6e',
+              color: '#14532d',
               font: { size: 13, weight: '700' },
             },
           },
@@ -390,9 +390,9 @@
     // ── Extra legend (percentile lines) ──────────────────────────────────────
     const legendExtra = document.getElementById('legendExtra');
     [
-      { color: '#38bdf8', label: 'P50 — mediana' },
-      { color: '#0284c7', label: 'P80' },
-      { color: '#0c4a6e', label: 'P95' },
+      { color: '#86efac', label: 'P50 — mediana' },
+      { color: '#16a34a', label: 'P80' },
+      { color: '#14532d', label: 'P95' },
     ].forEach(l => {
       legendExtra.innerHTML += `
         <span class="legend-item">
