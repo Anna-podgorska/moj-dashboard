@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scatterplot czasów realizacji</title>
+  <title>Scatterplot czasów realizacji — niebo</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
@@ -166,13 +166,13 @@
 
   <nav class="nav-bar">
     <a href="index.html">📊 Histogram czasów realizacji</a>
-    <a href="anna-podgorska.html" class="active">☁ Scatterplot czasów realizacji</a>
-    <a href="scatterplot.html">🌤 Scatterplot — niebo</a>
+    <a href="anna-podgorska.html">☁ Scatterplot czasów realizacji</a>
+    <a href="scatterplot.html" class="active">🌤 Scatterplot — niebo</a>
   </nav>
 
   <header class="page-header">
-    <h1>☁ Scatterplot czasów realizacji</h1>
-    <p>Czas realizacji zadań według daty ukończenia i rozmiaru (S / M / L)</p>
+    <h1>🌤 Scatterplot czasów realizacji</h1>
+    <p>Czas realizacji zadań według daty ukończenia i rozmiaru (S / M / L) — paleta nieba</p>
   </header>
 
   <!-- ── Stat cards ── -->
@@ -180,15 +180,15 @@
 
   <!-- ── Scatterplot ── -->
   <div class="chart-wrapper">
-    <h2>📊 Wykres punktowy — czas realizacji (dni)</h2>
+    <h2>📈 Wykres punktowy — czas realizacji (dni)</h2>
     <canvas id="scatterChart" height="420"></canvas>
     <div class="legend-extra" id="legendExtra"></div>
   </div>
 
-  <footer>Dashboard w odcieniach nieba &nbsp;·&nbsp; dane: Scatterplot czasów realizacji.csv</footer>
+  <footer>Dashboard w odcieniach nieba &nbsp;·&nbsp; dane: 2. Scatterplot czasów realizacji.csv</footer>
 
   <script>
-    // ── Raw data ──────────────────────────────────────────────────────────────
+    // ── Raw data from "2. Scatterplot czasów realizacji.csv" ──────────────────
     const rawData = [
       {date:'15.07.2024', size:'S', value:49},
       {date:'22.08.2024', size:'S', value:48},
@@ -228,13 +228,13 @@
       {date:'10.12.2025', size:'S', value:44},
     ];
 
-    // ── Parse date helper (DD.MM.YYYY → timestamp) ───────────────────────────
+    // ── Parse date helper (DD.MM.YYYY → timestamp) ────────────────────────────
     function parseDate(str) {
       const [d, m, y] = str.split('.').map(Number);
       return new Date(y, m - 1, d).getTime();
     }
 
-    // ── Percentile helper ─────────────────────────────────────────────────────
+    // ── Percentile helper (linear interpolation) ──────────────────────────────
     function calcPercentile(arr, p) {
       const sorted = [...arr].sort((a, b) => a - b);
       const pos = (p / 100) * (sorted.length - 1);
@@ -266,9 +266,9 @@
 
     // ── Sky-blue palette per size ─────────────────────────────────────────────
     const sizeStyle = {
-      S: { bg: 'rgba(125, 211, 252, 0.85)', border: '#0284c7', label: 'Rozmiar S' },
-      M: { bg: 'rgba( 56, 189, 248, 0.85)', border: '#0369a1', label: 'Rozmiar M' },
-      L: { bg: 'rgba( 14, 165, 233, 0.85)', border: '#0c4a6e', label: '⭐ Strategiczne (L)' },
+      S: { bg: 'rgba(186, 230, 253, 0.9)', border: '#38bdf8', label: 'Rozmiar S' },
+      M: { bg: 'rgba( 56, 189, 248, 0.85)', border: '#0284c7', label: 'Rozmiar M' },
+      L: { bg: 'rgba(  7, 89, 133, 0.85)', border: '#0c4a6e', label: '⭐ Strategiczne (L)' },
     };
 
     // ── Build scatter datasets per size ───────────────────────────────────────
