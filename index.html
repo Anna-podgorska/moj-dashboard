@@ -1,1 +1,233 @@
-test
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Histogram czasów realizacji</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 1.5rem;
+      color: #2d3748;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .chart-wrapper {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+      padding: 28px 24px 16px;
+      width: 100%;
+      max-width: 860px;
+    }
+    .legend-extra {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: #4a5568;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-line {
+      width: 28px;
+      height: 3px;
+      border-top: 3px dashed;
+    }
+  </style>
+</head>
+<body>
+  <h1>Histogram czasów realizacji</h1>
+  <div class="chart-wrapper">
+    <canvas id="histChart"></canvas>
+    <div class="legend-extra">
+      <span class="legend-item">
+        <span class="legend-line" style="border-color:#e53e3e;"></span>P50
+      </span>
+      <span class="legend-item">
+        <span class="legend-line" style="border-color:#dd6b20;"></span>P80
+      </span>
+      <span class="legend-item">
+        <span class="legend-line" style="border-color:#805ad5;"></span>P95
+      </span>
+    </div>
+  </div>
+
+  <script>
+    // ── raw data from "1 Histogram czasów realizacji.csv" ──────────────────
+    const rawData = [
+      {size:'S', value:49}, {size:'S', value:48}, {size:'S', value:87},
+      {size:'M', value:57}, {size:'M', value:148},
+      {size:'S', value:53}, {size:'S', value:45},
+      {size:'M', value:145},
+      {size:'L', value:105},
+      {size:'S', value:5},
+      {size:'L', value:163},
+      {size:'S', value:43},
+      {size:'M', value:415},
+      {size:'L', value:123},
+      {size:'M', value:103},
+      {size:'L', value:104},
+      {size:'L', value:302},
+      {size:'L', value:158},
+      {size:'L', value:98},
+      {size:'S', value:52},
+      {size:'M', value:95},
+      {size:'S', value:70},
+      {size:'M', value:95},
+      {size:'M', value:101},
+      {size:'M', value:57},
+      {size:'M', value:57},
+      {size:'S', value:53},
+      {size:'L', value:137},
+      {size:'S', value:73},
+      {size:'M', value:60},
+      {size:'S', value:126},
+      {size:'M', value:57},
+      {size:'L', value:124},
+      {size:'M', value:75},
+      {size:'M', value:89},
+      {size:'S', value:44},
+    ];
+
+    // ── percentile helper (linear interpolation) ───────────────────────────
+    function calcPercentile(arr, p) {
+      const sorted = [...arr].sort((a, b) => a - b);
+      const pos = (p / 100) * (sorted.length - 1);
+      const lo = Math.floor(pos);
+      const hi = Math.ceil(pos);
+      if (lo === hi) return sorted[lo];
+      return sorted[lo] + (pos - lo) * (sorted[hi] - sorted[lo]);
+    }
+
+    const allValues = rawData.map(d => d.value);
+    const p50 = calcPercentile(allValues, 50);
+    const p80 = calcPercentile(allValues, 80);
+    const p95 = calcPercentile(allValues, 95);
+
+    // ── build bins (width = 30 days) ───────────────────────────────────────
+    const BIN_WIDTH = 30;
+    const maxVal = Math.max(...allValues);
+    const numBins = Math.ceil((maxVal + 1) / BIN_WIDTH);
+
+    const binLabels = [];
+    for (let i = 0; i < numBins; i++) {
+      binLabels.push(`${i * BIN_WIDTH}–${(i + 1) * BIN_WIDTH}`);
+    }
+
+    const sizes = ['S', 'M', 'L'];
+    const counts = {};
+    sizes.forEach(s => { counts[s] = new Array(numBins).fill(0); });
+
+    rawData.forEach(d => {
+      const idx = Math.floor(d.value / BIN_WIDTH);
+      counts[d.size][idx]++;
+    });
+
+    // ── map a percentile value to a fractional bar-index position ──────────
+    // Bar index i covers the range [i*BIN_WIDTH, (i+1)*BIN_WIDTH).
+    // Chart.js places bar i centred at x = i, so x = value/BIN_WIDTH - 0.5.
+    function valueToX(v) {
+      return v / BIN_WIDTH - 0.5;
+    }
+
+    // ── colours for each size ──────────────────────────────────────────────
+    const sizeColors = {
+      S: 'rgba(72, 187, 120, 0.85)',   // green
+      M: 'rgba(66, 153, 225, 0.85)',   // blue
+      L: 'rgba(237, 137, 54, 0.85)',   // orange
+    };
+    const sizeBorder = {
+      S: 'rgba(47, 133, 90, 1)',
+      M: 'rgba(43, 108, 176, 1)',
+      L: 'rgba(192, 86, 33, 1)',
+    };
+
+    // ── Chart.js datasets ──────────────────────────────────────────────────
+    const datasets = sizes.map(s => ({
+      label: `Rozmiar ${s}`,
+      data: counts[s],
+      backgroundColor: sizeColors[s],
+      borderColor: sizeBorder[s],
+      borderWidth: 1,
+    }));
+
+    // ── annotation lines for percentiles ──────────────────────────────────
+    function percentileAnnotation(value, label, color) {
+      return {
+        type: 'line',
+        scaleID: 'x',
+        value: valueToX(value),
+        borderColor: color,
+        borderWidth: 2.5,
+        borderDash: [6, 4],
+        label: {
+          display: true,
+          content: `${label}: ${Math.round(value)} dni`,
+          position: 'start',
+          color: '#fff',
+          backgroundColor: color,
+          font: { size: 11, weight: 'bold' },
+          padding: { x: 6, y: 4 },
+          yAdjust: -6,
+        },
+      };
+    }
+
+    const annotations = {
+      p50line: percentileAnnotation(p50, 'P50', '#e53e3e'),
+      p80line: percentileAnnotation(p80, 'P80', '#dd6b20'),
+      p95line: percentileAnnotation(p95, 'P95', '#805ad5'),
+    };
+
+    // ── render chart ───────────────────────────────────────────────────────
+    const ctx = document.getElementById('histChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: binLabels, datasets },
+      options: {
+        plugins: {
+          legend: { position: 'top' },
+          annotation: { annotations },
+          tooltip: {
+            callbacks: {
+              title: items => `Czas realizacji: ${items[0].label} dni`,
+              label: item => ` ${item.dataset.label}: ${item.raw}`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            stacked: true,
+            title: { display: true, text: 'Czas realizacji (dni)', font: { size: 13 } },
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            ticks: { stepSize: 1, precision: 0 },
+            title: { display: true, text: 'Liczba zadań', font: { size: 13 } },
+          },
+        },
+        responsive: true,
+        maintainAspectRatio: true,
+      },
+    });
+  </script>
+</body>
+</html>
