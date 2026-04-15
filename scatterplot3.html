@@ -183,7 +183,7 @@
   <!-- ── Scatterplot ── -->
   <div class="chart-wrapper">
     <h2>📈 Wykres punktowy — czas realizacji (dni)</h2>
-    <canvas id="scatterChart" height="420"></canvas>
+    <canvas id="scatterChart" height="300"></canvas>
     <div class="legend-extra" id="legendExtra"></div>
   </div>
 
@@ -287,10 +287,36 @@
       pointHoverRadius: 10,
     }));
 
-    // ── X-axis range ──────────────────────────────────────────────────────────
+    // ── Linear regression trend line ─────────────────────────────────────────
     const allDates = rawData.map(d => parseDate(d.date));
     const xMin = Math.min(...allDates) - 15 * 86400000;
     const xMax = Math.max(...allDates) + 15 * 86400000;
+
+    const allPoints = rawData.map(d => ({ x: parseDate(d.date), y: d.value }));
+    const n = allPoints.length;
+    const sumX = allPoints.reduce((s, p) => s + p.x, 0);
+    const sumY = allPoints.reduce((s, p) => s + p.y, 0);
+    const sumXY = allPoints.reduce((s, p) => s + p.x * p.y, 0);
+    const sumX2 = allPoints.reduce((s, p) => s + p.x * p.x, 0);
+    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+    const trendDataset = {
+      label: 'Linia trendu',
+      data: [
+        { x: xMin, y: slope * xMin + intercept },
+        { x: xMax, y: slope * xMax + intercept },
+      ],
+      type: 'line',
+      borderColor: '#be123c',
+      borderWidth: 2.5,
+      borderDash: [6, 3],
+      backgroundColor: 'transparent',
+      pointRadius: 0,
+      pointHoverRadius: 0,
+      fill: false,
+      tension: 0,
+    };
+    datasets.push(trendDataset);
 
     // ── Annotations (horizontal percentile lines) ─────────────────────────────
     function percAnnotation(value, label, color, yAdj) {
@@ -373,6 +399,7 @@
           },
           y: {
             beginAtZero: true,
+            max: 450,
             ticks: { color: '#c2410c', stepSize: 50 },
             grid: { color: 'rgba(253, 186, 116, 0.5)' },
             title: {
@@ -384,7 +411,7 @@
           },
         },
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
       },
     });
 
@@ -394,6 +421,7 @@
       { color: '#fdba74', label: 'P50 — mediana' },
       { color: '#ea580c', label: 'P80' },
       { color: '#7c2d12', label: 'P95' },
+      { color: '#be123c', label: 'Linia trendu', dashed: true },
     ].forEach(l => {
       legendExtra.innerHTML += `
         <span class="legend-item">
